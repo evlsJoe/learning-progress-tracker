@@ -1,0 +1,1238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Learning Progress Tracker</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', sans-serif;
+            background: linear-gradient(135deg, #0f1419 0%, #1a202c 100%);
+            min-height: 100vh;
+            padding: 24px;
+            color: #e2e8f0;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: linear-gradient(to bottom, #1e293b, #162e4a);
+            padding: 40px;
+            border-radius: 12px;
+            margin-bottom: 32px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.8);
+            border: 1px solid #334155;
+        }
+
+        h1 {
+            color: #60a5fa;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            color: #94a3b8;
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        .header-controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border: none;
+            padding: 11px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            letter-spacing: 0.3px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+            box-shadow: 0 8px 16px rgba(37, 99, 235, 0.4);
+            transform: translateY(-1px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            background: #1e293b;
+            padding: 8px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            border: 1px solid #334155;
+        }
+
+        .tab-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.2s ease;
+            color: #94a3b8;
+            letter-spacing: 0.3px;
+        }
+
+        .tab-btn:hover {
+            background: rgba(59, 130, 246, 0.1);
+            color: #cbd5e1;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+            color: white;
+            border-color: #1d4ed8;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .content {
+            display: none;
+        }
+
+        .content.active {
+            display: block;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        .grid-1 {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 24px;
+        }
+
+        .card {
+            background: linear-gradient(to bottom, #1e293b, #1a2332);
+            padding: 24px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3), 0 1px 3px rgba(0,0,0,0.8);
+            border: 1px solid #334155;
+        }
+
+        .card h2 {
+            color: #60a5fa;
+            margin-bottom: 20px;
+            font-size: 16px;
+            font-weight: 700;
+            border-bottom: 2px solid #3b82f6;
+            padding-bottom: 12px;
+            letter-spacing: 0.3px;
+        }
+
+        .card h3 {
+            color: #cbd5e1;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .stat-box {
+            background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%);
+            color: white;
+            padding: 24px;
+            border-radius: 10px;
+            text-align: center;
+            margin-bottom: 12px;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: 36px;
+            font-weight: 700;
+            margin: 12px 0;
+            letter-spacing: -1px;
+        }
+
+        .form-group {
+            margin-bottom: 18px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #cbd5e1;
+            font-size: 13px;
+            letter-spacing: 0.3px;
+        }
+
+        input, textarea, select {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #334155;
+            border-radius: 8px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s ease;
+            background: #0f1419;
+            color: #e2e8f0;
+        }
+
+        input:focus, textarea:focus, select:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .sessions-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .sessions-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sessions-list::-webkit-scrollbar-track {
+            background: #0f1419;
+            border-radius: 10px;
+        }
+
+        .sessions-list::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 10px;
+        }
+
+        .sessions-list::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+
+        .session-item {
+            background: #0f1419;
+            padding: 16px;
+            border-left: 4px solid #3b82f6;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 1px solid #334155;
+        }
+
+        .session-date {
+            font-size: 11px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+
+        .session-details {
+            font-size: 13px;
+            line-height: 1.6;
+            color: #cbd5e1;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-bottom: 20px;
+        }
+
+        .heatmap {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            padding: 16px 0;
+        }
+
+        .heatmap-day {
+            aspect-ratio: 1;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 9px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .heatmap-day:hover {
+            transform: scale(1.15);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .level-1 { background: #1e293b; }
+        .level-2 { background: #4c6ef5; }
+        .level-3 { background: #3b82f6; }
+        .level-4 { background: #2563eb; }
+        .level-5 { background: #1d4ed8; }
+
+        .comparison-chart {
+            margin-top: 0;
+            padding: 0;
+            background: transparent;
+            border-radius: 0;
+            box-shadow: none;
+        }
+
+        .comparison-chart h3 {
+            color: #60a5fa;
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 0.3px;
+        }
+
+        .delete-btn {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 12px;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .delete-btn:hover {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .success-message {
+            background: linear-gradient(135deg, #064e3b 0%, #047857 100%);
+            color: #d1fae5;
+            padding: 14px 16px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+            border: 1px solid #10b981;
+            font-weight: 600;
+            font-size: 13px;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #1e293b;
+            padding: 32px;
+            border-radius: 12px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            border: 1px solid #334155;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+        }
+
+        .modal-header h2 {
+            color: #60a5fa;
+            font-size: 18px;
+            font-weight: 700;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.2s ease;
+        }
+
+        .close-btn:hover {
+            color: #cbd5e1;
+        }
+
+        .insight-box {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 4px solid #3b82f6;
+            padding: 16px;
+            margin: 12px 0;
+            border-radius: 8px;
+            border: 1px solid rgba(59, 130, 246, 0.2);
+        }
+
+        .insight-box strong {
+            color: #60a5fa;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📚 Learning Progress Tracker</h1>
+            <p>Track your Chess, Coding, and Math learning journey</p>
+            <div class="header-controls">
+                <button onclick="exportData()">💾 Export Data</button>
+                <button onclick="importData()">📂 Import Data</button>
+                <button onclick="clearAllData()">🗑️ Clear All Data</button>
+            </div>
+        </header>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('dashboard')">📊 Dashboard</button>
+            <button class="tab-btn" onclick="switchTab('chess')">♟️ Chess</button>
+            <button class="tab-btn" onclick="switchTab('coding')">💻 Coding</button>
+            <button class="tab-btn" onclick="switchTab('math')">📐 Math</button>
+        </div>
+
+        <!-- DASHBOARD -->
+        <div id="dashboard" class="content active">
+            <div class="grid-3">
+                <div class="card">
+                    <h2>♟️ Chess Progress</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-value" id="chess-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Hours</div>
+                        <div class="stat-value" id="chess-hours">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="chess-focus">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>💻 Coding Progress</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-value" id="coding-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Hours</div>
+                        <div class="stat-value" id="coding-hours">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="coding-focus">0</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h2>📐 Math Progress</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Sessions</div>
+                        <div class="stat-value" id="math-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Hours</div>
+                        <div class="stat-value" id="math-hours">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="math-focus">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>📈 Progress Over Time</h2>
+                <div class="chart-container">
+                    <canvas id="timelineChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🎯 Comparative Stats</h2>
+                <div class="grid-2">
+                    <div class="chart-container">
+                        <canvas id="statsChart"></canvas>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="focusChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🔥 Streak & Activity</h2>
+                <div id="streaks"></div>
+            </div>
+        </div>
+
+        <!-- CHESS -->
+        <div id="chess" class="content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>♟️ New Chess Session</h2>
+                    <div class="success-message" id="chess-success">Session saved successfully!</div>
+                    <form onsubmit="addSession(event, 'chess')">
+                        <div class="form-group">
+                            <label>Duration (minutes)</label>
+                            <input type="number" name="duration" min="1" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Focus Level (1-10)</label>
+                                <input type="number" name="focus" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Energy Level (1-10)</label>
+                                <input type="number" name="energy" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Difficulty (1-10)</label>
+                                <input type="number" name="difficulty" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Time of Day</label>
+                                <select name="timeOfDay" required>
+                                    <option value="">Select time</option>
+                                    <option value="early-morning">Early Morning (5-8am)</option>
+                                    <option value="morning">Morning (8-12pm)</option>
+                                    <option value="afternoon">Afternoon (12-5pm)</option>
+                                    <option value="evening">Evening (5-9pm)</option>
+                                    <option value="night">Night (9pm+)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Positions Studied</label>
+                            <input type="number" name="positionsStudied" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Successful Reconstructions</label>
+                            <input type="number" name="reconstructions" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Session Notes</label>
+                            <textarea name="notes" placeholder="What went well? Breakthroughs? Struggles?"></textarea>
+                        </div>
+                        <button type="submit">Add Session</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📊 Chess Statistics</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Sessions</div>
+                        <div class="stat-value" id="chess-total-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Time</div>
+                        <div class="stat-value" id="chess-total-time">0h</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="chess-avg-focus">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Best Session</div>
+                        <div class="stat-value" id="chess-best">0min</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🗓️ Activity Heatmap</h2>
+                <div id="chess-heatmap" class="heatmap"></div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Session History</h2>
+                <div class="sessions-list" id="chess-sessions-list"></div>
+            </div>
+        </div>
+
+        <!-- CODING -->
+        <div id="coding" class="content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>💻 New Coding Session</h2>
+                    <div class="success-message" id="coding-success">Session saved successfully!</div>
+                    <form onsubmit="addSession(event, 'coding')">
+                        <div class="form-group">
+                            <label>Duration (minutes)</label>
+                            <input type="number" name="duration" min="1" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Focus Level (1-10)</label>
+                                <input type="number" name="focus" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Energy Level (1-10)</label>
+                                <input type="number" name="energy" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Difficulty (1-10)</label>
+                                <input type="number" name="difficulty" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Time of Day</label>
+                                <select name="timeOfDay" required>
+                                    <option value="">Select time</option>
+                                    <option value="early-morning">Early Morning (5-8am)</option>
+                                    <option value="morning">Morning (8-12pm)</option>
+                                    <option value="afternoon">Afternoon (12-5pm)</option>
+                                    <option value="evening">Evening (5-9pm)</option>
+                                    <option value="night">Night (9pm+)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Bugs Fixed</label>
+                            <input type="number" name="bugFixed" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Concepts Mastered</label>
+                            <input type="number" name="conceptsMastered" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Session Notes</label>
+                            <textarea name="notes" placeholder="What errors did you learn from? Breakthrough moments?"></textarea>
+                        </div>
+                        <button type="submit">Add Session</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📊 Coding Statistics</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Sessions</div>
+                        <div class="stat-value" id="coding-total-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Time</div>
+                        <div class="stat-value" id="coding-total-time">0h</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="coding-avg-focus">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Bugs Fixed</div>
+                        <div class="stat-value" id="coding-total-bugs">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🗓️ Activity Heatmap</h2>
+                <div id="coding-heatmap" class="heatmap"></div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Session History</h2>
+                <div class="sessions-list" id="coding-sessions-list"></div>
+            </div>
+        </div>
+
+        <!-- MATH -->
+        <div id="math" class="content">
+            <div class="grid-2">
+                <div class="card">
+                    <h2>📐 New Math Session</h2>
+                    <div class="success-message" id="math-success">Session saved successfully!</div>
+                    <form onsubmit="addSession(event, 'math')">
+                        <div class="form-group">
+                            <label>Duration (minutes)</label>
+                            <input type="number" name="duration" min="1" required>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Focus Level (1-10)</label>
+                                <input type="number" name="focus" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Energy Level (1-10)</label>
+                                <input type="number" name="energy" min="1" max="10" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label>Difficulty (1-10)</label>
+                                <input type="number" name="difficulty" min="1" max="10" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Time of Day</label>
+                                <select name="timeOfDay" required>
+                                    <option value="">Select time</option>
+                                    <option value="early-morning">Early Morning (5-8am)</option>
+                                    <option value="morning">Morning (8-12pm)</option>
+                                    <option value="afternoon">Afternoon (12-5pm)</option>
+                                    <option value="evening">Evening (5-9pm)</option>
+                                    <option value="night">Night (9pm+)</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label>Formulas Learned</label>
+                            <input type="number" name="formulasLearned" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Problems Solved</label>
+                            <input type="number" name="problemsSolved" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Visualizations Created</label>
+                            <input type="number" name="visualizations" min="0">
+                        </div>
+                        <div class="form-group">
+                            <label>Session Notes</label>
+                            <textarea name="notes" placeholder="Formulas as objects? Visualizations? Rebuilds?"></textarea>
+                        </div>
+                        <button type="submit">Add Session</button>
+                    </form>
+                </div>
+
+                <div class="card">
+                    <h2>📊 Math Statistics</h2>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Sessions</div>
+                        <div class="stat-value" id="math-total-sessions">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Time</div>
+                        <div class="stat-value" id="math-total-time">0h</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Avg Focus</div>
+                        <div class="stat-value" id="math-avg-focus">0</div>
+                    </div>
+                    <div class="stat-box">
+                        <div class="stat-label">Total Problems</div>
+                        <div class="stat-value" id="math-total-problems">0</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>🗓️ Activity Heatmap</h2>
+                <div id="math-heatmap" class="heatmap"></div>
+            </div>
+
+            <div class="card">
+                <h2>📋 Session History</h2>
+                <div class="sessions-list" id="math-sessions-list"></div>
+            </div>
+        </div>
+    </div>
+
+    <input type="file" id="importFile" style="display: none;" accept=".json">
+
+    <script>
+        // Data structure
+        const data = {
+            chess: [],
+            coding: [],
+            math: []
+        };
+
+        // Load data from localStorage
+        function loadData() {
+            const stored = localStorage.getItem('learningTrackerData');
+            if (stored) {
+                Object.assign(data, JSON.parse(stored));
+            }
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('learningTrackerData', JSON.stringify(data));
+            updateDashboard();
+        }
+
+        // Switch tabs
+        function switchTab(tabName) {
+            document.querySelectorAll('.content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+
+            if (tabName !== 'dashboard') {
+                setTimeout(() => {
+                    updateTabContent(tabName);
+                }, 100);
+            }
+        }
+
+        // Add session
+        function addSession(e, topic) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+
+            const session = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                duration: parseInt(formData.get('duration')),
+                focus: parseInt(formData.get('focus')),
+                energy: parseInt(formData.get('energy')),
+                difficulty: parseInt(formData.get('difficulty')),
+                timeOfDay: formData.get('timeOfDay'),
+                notes: formData.get('notes')
+            };
+
+            // Add topic-specific fields
+            if (topic === 'chess') {
+                session.positionsStudied = parseInt(formData.get('positionsStudied')) || 0;
+                session.reconstructions = parseInt(formData.get('reconstructions')) || 0;
+            } else if (topic === 'coding') {
+                session.bugFixed = parseInt(formData.get('bugFixed')) || 0;
+                session.conceptsMastered = parseInt(formData.get('conceptsMastered')) || 0;
+            } else if (topic === 'math') {
+                session.formulasLearned = parseInt(formData.get('formulasLearned')) || 0;
+                session.problemsSolved = parseInt(formData.get('problemsSolved')) || 0;
+                session.visualizations = parseInt(formData.get('visualizations')) || 0;
+            }
+
+            data[topic].push(session);
+            saveData();
+
+            // Show success message
+            const successMsg = document.getElementById(`${topic}-success`);
+            successMsg.style.display = 'block';
+            setTimeout(() => {
+                successMsg.style.display = 'none';
+            }, 3000);
+
+            form.reset();
+            updateTabContent(topic);
+        }
+
+        // Calculate stats
+        function calculateStats(topic) {
+            const sessions = data[topic];
+            if (sessions.length === 0) return {
+                totalSessions: 0,
+                totalTime: 0,
+                avgFocus: 0,
+                avgEnergy: 0,
+                bestSession: 0
+            };
+
+            const totalTime = sessions.reduce((sum, s) => sum + s.duration, 0);
+            const avgFocus = Math.round(sessions.reduce((sum, s) => sum + s.focus, 0) / sessions.length);
+            const avgEnergy = Math.round(sessions.reduce((sum, s) => sum + s.energy, 0) / sessions.length);
+            const bestSession = Math.max(...sessions.map(s => s.duration));
+
+            return {
+                totalSessions: sessions.length,
+                totalTime: Math.round(totalTime / 60 * 10) / 10,
+                avgFocus,
+                avgEnergy,
+                bestSession
+            };
+        }
+
+        // Update dashboard
+        function updateDashboard() {
+            ['chess', 'coding', 'math'].forEach(topic => {
+                const stats = calculateStats(topic);
+                document.getElementById(`${topic}-sessions`).textContent = stats.totalSessions;
+                document.getElementById(`${topic}-hours`).textContent = stats.totalTime + 'h';
+                document.getElementById(`${topic}-focus`).textContent = stats.avgFocus;
+            });
+
+            updateCharts();
+            updateStreaks();
+        }
+
+        // Update tab content
+        function updateTabContent(topic) {
+            const stats = calculateStats(topic);
+            document.getElementById(`${topic}-total-sessions`).textContent = stats.totalSessions;
+            document.getElementById(`${topic}-total-time`).textContent = Math.floor(stats.totalTime) + 'h ' + Math.round((stats.totalTime % 1) * 60) + 'm';
+            document.getElementById(`${topic}-avg-focus`).textContent = stats.avgFocus;
+
+            if (topic === 'chess') {
+                const totalRecons = data[topic].reduce((sum, s) => sum + (s.reconstructions || 0), 0);
+                document.getElementById('chess-best').textContent = stats.bestSession + 'min';
+            } else if (topic === 'coding') {
+                const totalBugs = data[topic].reduce((sum, s) => sum + (s.bugFixed || 0), 0);
+                document.getElementById('coding-total-bugs').textContent = totalBugs;
+            } else if (topic === 'math') {
+                const totalProblems = data[topic].reduce((sum, s) => sum + (s.problemsSolved || 0), 0);
+                document.getElementById('math-total-problems').textContent = totalProblems;
+            }
+
+            updateSessionsList(topic);
+            updateHeatmap(topic);
+        }
+
+        // Update sessions list
+        function updateSessionsList(topic) {
+            const container = document.getElementById(`${topic}-sessions-list`);
+            const sessions = [...data[topic]].reverse();
+
+            container.innerHTML = sessions.map(session => {
+                const date = new Date(session.date);
+                let extraInfo = '';
+
+                if (topic === 'chess') {
+                    extraInfo = `📍 ${session.positionsStudied} positions | ✓ ${session.reconstructions} reconstructions`;
+                } else if (topic === 'coding') {
+                    extraInfo = `🐛 ${session.bugFixed} bugs fixed | 🎯 ${session.conceptsMastered} concepts`;
+                } else if (topic === 'math') {
+                    extraInfo = `📋 ${session.formulasLearned} formulas | ✓ ${session.problemsSolved} problems | 🎨 ${session.visualizations} visuals`;
+                }
+
+                return `
+                    <div class="session-item">
+                        <div class="session-date">${date.toLocaleString()}</div>
+                        <div class="session-details">
+                            <strong>⏱️ ${session.duration} min</strong> | 
+                            🎯 Focus: ${session.focus}/10 | 
+                            ⚡ Energy: ${session.energy}/10 | 
+                            📊 Difficulty: ${session.difficulty}/10 | 
+                            🕐 ${session.timeOfDay}
+                            <br>${extraInfo}
+                            ${session.notes ? `<br><em>"${session.notes}"</em>` : ''}
+                        </div>
+                        <button class="delete-btn" onclick="deleteSession('${topic}', ${session.id})">Delete</button>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // Delete session
+        function deleteSession(topic, id) {
+            data[topic] = data[topic].filter(s => s.id !== id);
+            saveData();
+            updateTabContent(topic);
+        }
+
+        // Update heatmap
+        function updateHeatmap(topic) {
+            const container = document.getElementById(`${topic}-heatmap`);
+            const today = new Date();
+            const startDate = new Date(today);
+            startDate.setDate(startDate.getDate() - 364); // 52 weeks
+
+            const heatmapData = {};
+            data[topic].forEach(session => {
+                const date = new Date(session.date);
+                const dateStr = date.toISOString().split('T')[0];
+                heatmapData[dateStr] = (heatmapData[dateStr] || 0) + session.duration;
+            });
+
+            const maxValue = Math.max(...Object.values(heatmapData), 1);
+            let html = '';
+
+            for (let i = 0; i < 364; i++) {
+                const date = new Date(startDate);
+                date.setDate(date.getDate() + i);
+                const dateStr = date.toISOString().split('T')[0];
+                const value = heatmapData[dateStr] || 0;
+                const level = value === 0 ? 'level-1' : value < maxValue * 0.25 ? 'level-2' : value < maxValue * 0.5 ? 'level-3' : value < maxValue * 0.75 ? 'level-4' : 'level-5';
+
+                html += `<div class="heatmap-day ${level}" title="${dateStr}: ${value} min" style="opacity: ${value > 0 ? 1 : 0.3}"></div>`;
+            }
+
+            container.innerHTML = html;
+        }
+
+        // Update charts
+        function updateCharts() {
+            const ctxTimeline = document.getElementById('timelineChart');
+            const ctxStats = document.getElementById('statsChart');
+            const ctxFocus = document.getElementById('focusChart');
+
+            if (!ctxTimeline) return;
+
+            // Timeline chart
+            const days = 30;
+            const today = new Date();
+            const timelineData = { chess: [], coding: [], math: [] };
+
+            for (let i = days - 1; i >= 0; i--) {
+                const date = new Date(today);
+                date.setDate(date.getDate() - i);
+                const dateStr = date.toISOString().split('T')[0];
+
+                ['chess', 'coding', 'math'].forEach(topic => {
+                    const minutes = data[topic]
+                        .filter(s => s.date.split('T')[0] === dateStr)
+                        .reduce((sum, s) => sum + s.duration, 0);
+                    timelineData[topic].push(minutes);
+                });
+            }
+
+            if (window.timelineChart && typeof window.timelineChart.destroy === 'function') window.timelineChart.destroy();
+            window.timelineChart = new Chart(ctxTimeline, {
+                type: 'line',
+                data: {
+                    labels: Array.from({length: days}, (_, i) => {
+                        const d = new Date(today);
+                        d.setDate(d.getDate() - (days - 1 - i));
+                        return (d.getMonth() + 1) + '/' + d.getDate();
+                    }),
+                    datasets: [
+                        {
+                            label: 'Chess',
+                            data: timelineData.chess,
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Coding',
+                            data: timelineData.coding,
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                            tension: 0.4
+                        },
+                        {
+                            label: 'Math',
+                            data: timelineData.math,
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                            tension: 0.4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'top' }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Stats chart
+            const stats = {
+                chess: calculateStats('chess'),
+                coding: calculateStats('coding'),
+                math: calculateStats('math')
+            };
+
+            if (window.statsChart && typeof window.statsChart.destroy === 'function') window.statsChart.destroy();
+            window.statsChart = new Chart(ctxStats, {
+                type: 'bar',
+                data: {
+                    labels: ['Chess', 'Coding', 'Math'],
+                    datasets: [{
+                        label: 'Total Hours',
+                        data: [stats.chess.totalTime, stats.coding.totalTime, stats.math.totalTime],
+                        backgroundColor: ['#667eea', '#764ba2', '#f59e0b']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        y: { beginAtZero: true }
+                    }
+                }
+            });
+
+            // Focus chart
+            if (window.focusChart && typeof window.focusChart.destroy === 'function') window.focusChart.destroy();
+            window.focusChart = new Chart(ctxFocus, {
+                type: 'radar',
+                data: {
+                    labels: ['Focus', 'Energy', 'Sessions', 'Time (hours)', 'Difficulty'],
+                    datasets: [
+                        {
+                            label: 'Chess',
+                            data: [stats.chess.avgFocus, stats.chess.avgEnergy, stats.chess.totalSessions, stats.chess.totalTime, 0],
+                            borderColor: '#667eea',
+                            backgroundColor: 'rgba(102, 126, 234, 0.2)'
+                        },
+                        {
+                            label: 'Coding',
+                            data: [stats.coding.avgFocus, stats.coding.avgEnergy, stats.coding.totalSessions, stats.coding.totalTime, 0],
+                            borderColor: '#764ba2',
+                            backgroundColor: 'rgba(118, 75, 162, 0.2)'
+                        },
+                        {
+                            label: 'Math',
+                            data: [stats.math.avgFocus, stats.math.avgEnergy, stats.math.totalSessions, stats.math.totalTime, 0],
+                            borderColor: '#f59e0b',
+                            backgroundColor: 'rgba(245, 158, 11, 0.2)'
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        r: {
+                            beginAtZero: true,
+                            max: 10
+                        }
+                    }
+                }
+            });
+        }
+
+        // Update streaks
+        function updateStreaks() {
+            const container = document.getElementById('streaks');
+            let html = '<div class="grid-3">';
+
+            ['chess', 'coding', 'math'].forEach(topic => {
+                const sessions = data[topic];
+                const today = new Date();
+                let streak = 0;
+
+                for (let i = 0; i < 365; i++) {
+                    const date = new Date(today);
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    const hasSession = sessions.some(s => s.date.split('T')[0] === dateStr);
+                    if (hasSession) {
+                        streak++;
+                    } else {
+                        break;
+                    }
+                }
+
+                const topicName = topic.charAt(0).toUpperCase() + topic.slice(1);
+                const emoji = topic === 'chess' ? '♟️' : topic === 'coding' ? '💻' : '📐';
+                html += `
+                    <div class="card">
+                        <h3>${emoji} ${topicName}</h3>
+                        <div class="stat-box">
+                            <div class="stat-label">Current Streak</div>
+                            <div class="stat-value" style="color: #ff6b6b;">${streak}</div>
+                        </div>
+                    </div>
+                `;
+            });
+
+            html += '</div>';
+            container.innerHTML = html;
+        }
+
+        // Export data
+        function exportData() {
+            const dataStr = JSON.stringify(data, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `learning-tracker-${new Date().toISOString().split('T')[0]}.json`;
+            link.click();
+        }
+
+        // Import data
+        function importData() {
+            document.getElementById('importFile').click();
+        }
+
+        document.getElementById('importFile').addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const imported = JSON.parse(event.target.result);
+                        Object.assign(data, imported);
+                        saveData();
+                        alert('Data imported successfully!');
+                    } catch (err) {
+                        alert('Error importing data: ' + err.message);
+                    }
+                };
+                reader.readAsText(file);
+            }
+        });
+
+        // Clear all data
+        function clearAllData() {
+            if (confirm('Are you sure you want to delete ALL data? This cannot be undone.')) {
+                data.chess = [];
+                data.coding = [];
+                data.math = [];
+                saveData();
+                alert('All data cleared!');
+                location.reload();
+            }
+        }
+
+        // Initialize
+        loadData();
+        updateDashboard();
+    </script>
+</body>
+</html>
