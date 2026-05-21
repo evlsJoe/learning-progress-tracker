@@ -25,7 +25,7 @@ Learn formulas as objects with visual transformations. Track rebuilds and visual
 
 ## How to Use
 
-1. Open 'https://rawcdn.githack.com/evlsJoe/learning-progress-tracker/main/index.html` in your browser
+1. Open (https://rawcdn.githack.com/evlsJoe/learning-progress-tracker/main/index.html) in your browser
 2. Select a topic (Chess, Coding, or Math)
 3. Log your sessions with metrics like:
    - Duration
